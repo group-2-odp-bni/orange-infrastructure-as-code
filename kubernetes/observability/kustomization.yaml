@@ -30,6 +30,8 @@ resources:
   - prometheus
   - tempo
   - grafana
+  - otel-collector
+  - uptime-kuma
 
 labels:
   - pairs:
