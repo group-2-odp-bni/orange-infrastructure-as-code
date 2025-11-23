@@ -17,6 +17,32 @@ variable "environment" {
   type        = string
 }
 
+# -----------------------------------------------------------------------------
+# Profile Bucket Configuration
+# -----------------------------------------------------------------------------
+
+variable "enable_profile_bucket" {
+  description = "Enable user profile images bucket and storage SA"
+  type        = bool
+  default     = true
+}
+
+variable "profile_bucket_name" {
+  description = "Name of the profile images bucket (must be globally unique)"
+  type        = string
+  default     = ""
+}
+
+variable "k3s_node_sa_email" {
+  description = "Email of the k3s node service account for impersonation"
+  type        = string
+  default     = ""
+}
+
+# -----------------------------------------------------------------------------
+# Backup Bucket Configuration
+# -----------------------------------------------------------------------------
+
 variable "backup_bucket_name" {
   description = "Name of the backup bucket (must be globally unique)"
   type        = string

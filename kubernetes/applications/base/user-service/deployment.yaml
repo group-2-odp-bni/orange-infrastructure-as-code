@@ -146,21 +146,23 @@ spec:
                   name: user-service-config
                   key: gcs.project-id
 
+            - name: GCS_SERVICE_ACCOUNT_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: user-service-config
+                  key: gcs.service-account-email
+
             - name: GCS_SIGNED_URL_DURATION
               valueFrom:
                 configMapKeyRef:
                   name: user-service-config
                   key: gcs.signed-url-duration
 
-            - name: GCS_SERVICE_ACCOUNT_EMAIL
+            - name: GCS_ENABLED
               valueFrom:
-                secretKeyRef:
-                  name: gcp-service-account
-                  key: email
-
-            # GCP Service Account Credentials
-            - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: "/app/gcp/service-account-key.json"
+                configMapKeyRef:
+                  name: user-service-config
+                  key: gcs.enabled
 
             # JVM Options
             - name: JAVA_OPTS
@@ -213,21 +215,10 @@ spec:
             failureThreshold: 12
 
           volumeMounts:
-            - name: gcp-sa-key
-              mountPath: /app/gcp
-              readOnly: true
-
             - name: tmp
               mountPath: /tmp
 
       volumes:
-        - name: gcp-sa-key
-          secret:
-            secretName: gcp-service-account
-            items:
-              - key: key.json
-                path: service-account-key.json
-
         - name: tmp
           emptyDir: {}
 

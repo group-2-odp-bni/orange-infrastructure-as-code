@@ -112,7 +112,7 @@ module "loadbalancer" {
 }
 
 # =============================================================================
-# Storage Module - GCS Buckets
+# Storage Module - GCS Buckets & Service Accounts
 # =============================================================================
 
 module "storage" {
@@ -122,6 +122,12 @@ module "storage" {
   region      = var.region
   environment = var.environment
 
+  # Profile bucket configuration
+  enable_profile_bucket = var.enable_profile_bucket
+  profile_bucket_name   = var.profile_bucket_name
+  k3s_node_sa_email     = local.k3s_node_sa_email
+
+  # Backup bucket configuration
   backup_bucket_name    = var.backup_bucket_name
   backup_retention_days = var.backup_retention_days
 

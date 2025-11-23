@@ -132,6 +132,18 @@ variable "ssh_public_key_path" {
 # Storage Configuration
 # -----------------------------------------------------------------------------
 
+variable "enable_profile_bucket" {
+  description = "Enable user profile images bucket and storage service account"
+  type        = bool
+  default     = true
+}
+
+variable "profile_bucket_name" {
+  description = "Name of GCS bucket for user profile images"
+  type        = string
+  default     = "orange-wallet-users-profiles"
+}
+
 variable "backup_bucket_name" {
   description = "Name of GCS bucket for database backups"
   type        = string
