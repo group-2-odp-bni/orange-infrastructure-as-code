@@ -94,6 +94,16 @@ output "backup_bucket_url" {
   value       = module.storage.backup_bucket_url
 }
 
+output "profile_bucket_name" {
+  description = "Name of the profile images bucket"
+  value       = module.storage.profile_bucket_name
+}
+
+output "storage_sa_email" {
+  description = "Email of the storage service account for signed URLs"
+  value       = module.storage.storage_sa_email
+}
+
 # -----------------------------------------------------------------------------
 # Ansible Inventory Data
 # -----------------------------------------------------------------------------
@@ -153,6 +163,8 @@ output "infrastructure_summary" {
 
   STORAGE:
   - Backup Bucket: ${module.storage.backup_bucket_name}
+  - Profile Bucket: ${module.storage.profile_bucket_name}
+  - Storage SA: ${module.storage.storage_sa_email}
 
   NEXT STEPS:
   1. Run Ansible playbook to install K3s
