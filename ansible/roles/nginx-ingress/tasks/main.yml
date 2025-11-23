@@ -39,12 +39,6 @@
           default: true
         metrics:
           enabled: true
-          # Expose metrics port as NodePort for GCP Load Balancer health checks
-          # This bypasses Ingress rules and SSL redirects, returning 200 OK on /healthz
-          service:
-            type: NodePort
-            servicePort: 10254
-            nodePort: 30254
         podAnnotations:
           prometheus.io/scrape: "true"
           prometheus.io/port: "10254"

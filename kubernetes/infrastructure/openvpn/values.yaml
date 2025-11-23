@@ -1,0 +1,67 @@
+# =============================================================================
+# OpenVPN Helm Chart Values
+# =============================================================================
+# Provides VPN access to cluster internal services (PostgreSQL, Redis, Kafka)
+# for local development tools (DBeaver, RedisInsight, etc.)
+# =============================================================================
+
+# OpenVPN server configuration
+openvpn:
+  # Network configuration
+  OVPN_NETWORK: 10.240.0.0  # VPN client IP range
+  OVPN_SUBNET: 255.255.255.0
+  OVPN_PROTO: tcp
+  OVPN_K8S_POD_NETWORK: "10.1.0.0"  # K3s pod CIDR
+  OVPN_K8S_POD_SUBNET: "255.255.0.0"
+  OVPN_K8S_SVC_NETWORK: "10.2.0.0"  # K3s service CIDR
+  OVPN_K8S_SVC_SUBNET: "255.255.0.0"
+
+  # Push routes to client
+  dhcpOptionDomain: true
+
+  # Redirect all traffic through VPN (set to false for split-tunnel)
+  redirectGateway: false
+
+# Service configuration
+service:
+  type: NodePort
+  externalPort: 443  # Match pod port
+  internalPort: 443  # Force pod to use 443
+  nodePort: 31194  # Fixed NodePort for consistency
+  externalIPs: []
+
+# Resource limits
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 256Mi
+
+# Persistence for PKI and client configs
+persistence:
+  enabled: true
+  storageClass: "local-path"  # K3s default StorageClass
+  accessMode: ReadWriteOnce
+  size: 2Gi
+
+# Security
+podSecurityContext:
+  runAsNonRoot: false  # OpenVPN needs root for network config
+  runAsUser: 0
+
+# Node selector - run on master node for stability
+nodeSelector:
+  node-role.kubernetes.io/master: "true"
+
+# Tolerations for master node
+tolerations:
+  - key: node-role.kubernetes.io/master
+    operator: Exists
+    effect: NoSchedule
+
+# Replicas
+replicaCount: 1
+
+# Use default image from chart (kylemanna/openvpn)

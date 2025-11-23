@@ -29,13 +29,13 @@ locals {
   worker_configs = {
     worker-1 = {
       name         = "orange-wallet-worker-1"
-      machine_type = var.worker_stateless_machine_type
+      machine_type = "e2-standard-2"  # Upgraded from e2-medium (4GB → 8GB) for notification-worker
       workload     = "stateless"
       tags         = concat(local.common_tags, ["k3s-worker", "stateless"])
     }
     worker-2 = {
       name         = "orange-wallet-worker-2"
-      machine_type = var.worker_stateless_machine_type
+      machine_type = "e2-standard-2"  # Upgraded from e2-medium (4GB → 8GB) for balanced stateless capacity
       workload     = "stateless"
       tags         = concat(local.common_tags, ["k3s-worker", "stateless"])
     }
@@ -104,6 +104,10 @@ resource "google_compute_instance" "master" {
     email  = var.service_account_email
     scopes = ["cloud-platform"]
   }
+
+  # Enable IP forwarding for VPN and network routing
+  # CRITICAL: Required for OpenVPN, K3s Flannel, and pod networking
+  can_ip_forward = true
 
   allow_stopping_for_update = true
 

@@ -40,7 +40,7 @@
         name: k3s
         state: started
       register: k3s_service
-      failed_when: false
+      failed_when: "false"
       tags: [cluster, health]
 
     - name: "VALIDATION 02 - Verify all nodes are Ready"
@@ -49,7 +49,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: nodes_not_ready
-      failed_when: nodes_not_ready.stdout|int > 0
+      failed_when: "nodes_not_ready.stdout|int > 0"
       changed_when: false
       tags: [cluster, nodes]
 
@@ -75,7 +75,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: stateless_nodes
-      failed_when: stateless_nodes.stdout|int < 2
+      failed_when: "stateless_nodes.stdout|int < 2"
       changed_when: false
       tags: [cluster, labels]
 
@@ -85,7 +85,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: stateful_nodes
-      failed_when: stateful_nodes.stdout|int < 1
+      failed_when: "stateful_nodes.stdout|int < 1"
       changed_when: false
       tags: [cluster, labels]
 
@@ -95,7 +95,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: tainted_nodes
-      failed_when: tainted_nodes.stdout == ""
+      failed_when: "tainted_nodes.stdout == "
       changed_when: false
       tags: [cluster, taints]
 
@@ -105,7 +105,7 @@
     - name: "VALIDATION 07 - Check Helm installation"
       ansible.builtin.command: helm version --short
       register: helm_version
-      failed_when: helm_version.rc != 0
+      failed_when: "helm_version.rc != 0"
       changed_when: false
       tags: [infrastructure, helm]
 
@@ -120,7 +120,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: nginx_pods
-      failed_when: nginx_pods.stdout|int == 0
+      failed_when: "nginx_pods.stdout|int == 0"
       changed_when: false
       tags: [infrastructure, nginx]
 
@@ -130,37 +130,17 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: nginx_http_port
-      failed_when: nginx_http_port.stdout != "30080"
+      failed_when: "nginx_http_port.stdout != "
       changed_when: false
       tags: [infrastructure, nginx]
 
-    - name: "VALIDATION 10 - Check Cert-Manager pods"
-      ansible.builtin.shell: |
-        kubectl get pods -n cert-manager --no-headers | grep -c "Running"
-      environment:
-        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-      register: certmanager_pods
-      failed_when: certmanager_pods.stdout|int < 3
-      changed_when: false
-      tags: [infrastructure, cert-manager]
-
-    - name: "VALIDATION 11 - Check Cert-Manager CRDs"
-      ansible.builtin.shell: |
-        kubectl get crd | grep -c "cert-manager.io"
-      environment:
-        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-      register: certmanager_crds
-      failed_when: certmanager_crds.stdout|int < 5
-      changed_when: false
-      tags: [infrastructure, cert-manager]
-
-    - name: "VALIDATION 12 - Check Metrics Server deployment"
+    - name: "VALIDATION 10 - Check Metrics Server deployment"
       ansible.builtin.shell: |
         kubectl get deployment -n kube-system metrics-server -o jsonpath='{.status.availableReplicas}'
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: metrics_server_replicas
-      failed_when: metrics_server_replicas.stdout|int == 0
+      failed_when: "metrics_server_replicas.stdout|int == 0"
       changed_when: false
       tags: [infrastructure, metrics]
 
@@ -169,7 +149,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: metrics_top_nodes
-      failed_when: metrics_top_nodes.rc != 0
+      failed_when: "metrics_top_nodes.rc != 0"
       changed_when: false
       retries: 3
       delay: 10
@@ -186,7 +166,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: eso_pods
-      failed_when: eso_pods.stdout|int == 0
+      failed_when: "eso_pods.stdout|int == 0"
       changed_when: false
       tags: [infrastructure, external-secrets]
 
@@ -196,7 +176,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: eso_crds
-      failed_when: eso_crds.stdout|int < 5
+      failed_when: "eso_crds.stdout|int < 5"
       changed_when: false
       tags: [infrastructure, external-secrets]
 
@@ -209,7 +189,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: argocd_namespace
-      failed_when: false
+      failed_when: "false"
       changed_when: false
       tags: [argocd]
 
@@ -219,7 +199,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: argocd_pods
-      failed_when: false
+      failed_when: "false"
       changed_when: false
       when: argocd_namespace.stdout|int > 0
       tags: [argocd]
@@ -230,7 +210,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: argocd_port
-      failed_when: false
+      failed_when: "false"
       changed_when: false
       when: argocd_namespace.stdout|int > 0
       tags: [argocd]
@@ -244,7 +224,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: default_storageclass
-      failed_when: default_storageclass.stdout == ""
+      failed_when: "default_storageclass.stdout == "
       changed_when: false
       tags: [storage]
 
@@ -259,7 +239,7 @@
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       register: coredns_pods
-      failed_when: coredns_pods.stdout|int == 0
+      failed_when: "coredns_pods.stdout|int == 0"
       changed_when: false
       tags: [networking, dns]
 

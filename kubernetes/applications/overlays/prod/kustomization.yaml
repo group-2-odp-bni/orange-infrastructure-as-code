@@ -27,6 +27,35 @@ resources:
 
 # Patches for production environment
 patches:
+  - target:
+      kind: Ingress
+      name: orange-wallet-ingress
+    patch: |-
+      - op: add
+        path: /spec/tls
+        value:
+          - hosts:
+              - api.orangebybni.my.id
+            secretName: orange-wallet-tls
+      - op: add
+        path: /spec/rules/0/host
+        value: api.orangebybni.my.id
+      - op: replace
+        path: /metadata/annotations/nginx.ingress.kubernetes.io~1ssl-redirect
+        value: "true"
+      - op: add
+        path: /metadata/annotations/cert-manager.io~1cluster-issuer
+        value: letsencrypt-prod
+      - op: replace
+        path: /metadata/annotations/nginx.ingress.kubernetes.io~1cors-allow-origin
+        value: "https://orangebybni.my.id"  # Restrict CORS
+
+  # Remove development backend ingress in production
+  - target:
+      kind: Ingress
+      name: orange-wallet-backend-dev
+    patch: |-
+      $patch: delete
   # Increase replicas for high availability
   - target:
       kind: Deployment
@@ -104,35 +133,3 @@ labels:
   - pairs:
       environment: prod
       app.kubernetes.io/environment: prod
-
-# Ingress patch for production domain and TLS
-patches:
-  - target:
-      kind: Ingress
-      name: orange-wallet-ingress
-    patch: |-
-      - op: add
-        path: /spec/tls
-        value:
-          - hosts:
-              - api.orange-wallet.com
-            secretName: orange-wallet-tls
-      - op: add
-        path: /spec/rules/0/host
-        value: api.orange-wallet.com
-      - op: replace
-        path: /metadata/annotations/nginx.ingress.kubernetes.io~1ssl-redirect
-        value: "true"
-      - op: add
-        path: /metadata/annotations/cert-manager.io~1cluster-issuer
-        value: letsencrypt-prod
-      - op: replace
-        path: /metadata/annotations/nginx.ingress.kubernetes.io~1cors-allow-origin
-        value: "https://orange-wallet.com"  # Restrict CORS
-
-  # Remove development backend ingress in production
-  - target:
-      kind: Ingress
-      name: orange-wallet-backend-dev
-    patch: |-
-      $patch: delete

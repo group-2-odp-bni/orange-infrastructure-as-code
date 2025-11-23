@@ -139,7 +139,7 @@ resource "google_compute_firewall" "allow_http_https" {
   target_tags = ["k3s-worker"]
 }
 
-# Allow health checks from GCP load balancers
+# Allow health checks and load balancer traffic from GCP
 resource "google_compute_firewall" "allow_health_checks" {
   name    = "${var.vpc_name}-allow-health-checks"
   network = google_compute_network.vpc.name
@@ -147,18 +147,38 @@ resource "google_compute_firewall" "allow_health_checks" {
 
   allow {
     protocol = "tcp"
-    ports    = ["80", "443", "10256", "30080", "30443", "30254"]
+    ports    = ["80", "443", "30254"]  # HTTP, HTTPS, Health check endpoint
   }
 
-  # GCP health check source ranges
+  # GCP health check and load balancer source ranges
   source_ranges = [
-    "35.191.0.0/16",
-    "130.211.0.0/22"
+    "35.191.0.0/16",      # GCP Health Checks & LB
+    "130.211.0.0/22",     # GCP Health Checks & LB (legacy)
+    "209.85.152.0/22",    # GCP Health Checks
+    "209.85.204.0/22"     # GCP Health Checks
   ]
 
   priority = 1000
 
   target_tags = ["k3s-worker"]
+}
+
+# Allow OpenVPN access for VPN clients
+resource "google_compute_firewall" "allow_openvpn" {
+  name    = "${var.vpc_name}-allow-openvpn"
+  network = google_compute_network.vpc.name
+  project = var.project_id
+
+  allow {
+    protocol = "udp"
+    ports    = ["31194"] # OpenVPN NodePort
+  }
+
+  source_ranges = ["0.0.0.0/0"] # TODO: Restrict to specific IPs if needed
+
+  priority = 1000
+
+  target_tags = ["k3s-master"] # OpenVPN runs on master node
 }
 
 # -----------------------------------------------------------------------------
